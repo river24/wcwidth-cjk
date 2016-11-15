@@ -1,0 +1,43 @@
+BUILD_TARGETS = wcwidth-cjk libwcwidth-cjk.dylib wcwidth
+
+CC = gcc
+#CC = gcc46 # For FreeBSD
+#CC = clang # For FreeBSD 10, suggested
+CFLAGS = -O2 -Wall -fPIC -Dwcwidth_cjk=wcwidth -Dwcswidth_cjk=wcswidth
+LDSHARED = $(CC) -dynamiclib
+LDFLAGS =
+
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+libdir = $(exec_prefix)/lib
+
+default: build
+
+clean:
+	rm -f $(BUILD_TARGETS)
+	rm -f *.o *.dylib *.tmp
+
+install:
+	mkdir -m 0755 -p $(DESTDIR)$(bindir)
+	rm -f $(DESTDIR)$(bindir)/wcwidth-cjk
+	cp wcwidth-cjk $(DESTDIR)$(bindir)/
+	rm -f $(DESTDIR)$(bindir)/wcwidth
+	cp wcwidth $(DESTDIR)$(bindir)/
+	mkdir -m 0755 -p $(DESTDIR)$(libdir)
+	rm -f $(DESTDIR)$(libdir)/libwcwidth-cjk.dylib
+	cp libwcwidth-cjk.dylib $(DESTDIR)$(libdir)/
+
+build: $(BUILD_TARGETS)
+
+wcwidth-cjk: wcwidth-cjk.osx
+	sed 's#@libdir@#$(libdir)#g' wcwidth-cjk.osx >$@.tmp
+	chmod +x $@.tmp
+	mv $@.tmp $@
+
+libwcwidth-cjk.dylib: wcwidth.o
+	$(LDSHARED) $(LDFLAGS) -o $@ wcwidth.o
+
+wcwidth: wcwidth-cmd.o
+	$(CC) $(CFLAGS) -o $@ wcwidth-cmd.o
+
