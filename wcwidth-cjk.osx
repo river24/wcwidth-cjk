@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 COMMAND [ARGUMENT ...]" 1>&2
+  exit 1
+fi
+
+wcwidth_cjk_so="@libdir@/libwcwidth-cjk.dylib"
+
+case ":$DYLD_INSERT_LIBRARIES:" in
+*":$wcwidth_cjk_so:"*)
+  ;;
+*)
+  DYLD_INSERT_LIBRARIES="${DYLD_INSERT_LIBRARIES:+$DYLD_INSERT_LIBRARIES:}$wcwidth_cjk_so"
+  ;;
+esac
+
+if [ x"$1" = x"--sh-init" ]; then
+  echo "DYLD_INSERT_LIBRARIES='$DYLD_INSERT_LIBRARIES'"
+  echo "export DYLD_INSERT_LIBRARIES"
+  exit 0
+fi
+
+DYLD_FORCE_FLAT_NAMESPACE=1
+export DYLD_FORCE_FLAT_NAMESPACE
+export DYLD_INSERT_LIBRARIES
+
+exec "$@"
+exit 1
+

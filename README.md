@@ -22,23 +22,11 @@ fixing "East Asian Ambiguous Width Characters" problem.
 How to build
 ---------------------------------------------------------------------
 
-Required packages: autoconf, automake, libtool, make, cc (gcc or misc)
-
-    $ autoreconf --install
-    $ configure --prefix=/usr/local/
-    $ make
-    $ sudo make install
+    $ make -f Makefile.osx
+    $ sudo make -f Makefile.osx install
 
 Usage
 ---------------------------------------------------------------------
-
-Run a command with `$LD_PRELOAD`-able library:
-
-    $ export LD_PRELOAD=/usr/local/lib/wcwidth-cjk.so
-    $ exec zsh -l
-    ...
-
-or:
 
     $ eval `/usr/local/bin/wcwidth-cjk --sh-init`
     $ exec zsh -l
